@@ -1,4 +1,7 @@
 # Code beeing developed that reads a csv file containing all zip codes and creates a database containing these data
+import psycopg2
+import csv
+
 reader = csv.reader(open("output.csv", encoding="utf-8"))
 
 conn = psycopg2.connect(host="localhost",
