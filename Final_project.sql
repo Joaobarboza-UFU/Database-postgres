@@ -1,6 +1,4 @@
---Cliente, Produto, FuncionÃ¡rios, VeÃ­culos, Entregas, Cargos
---Cliente, Produto, VeÃ­culo, Cargos, FuncinÃ¡rios, Entregas
---Criando Empresa
+--Criando Database Transporte
 CREATE DATABASE transport
     WITH OWNER 'postgres'
     ENCODING 'UTF8';
@@ -8,7 +6,25 @@ CREATE DATABASE transport
 --Criando Schema Company
 CREATE SCHEMA IF NOT EXISTS company;
 
---Tabela Tipos de UsuÃ¡rios
+--DBA
+CREATE USER dba WITH SUPERUSER CONNECTION LIMIT 1;
+
+--ANALISTA
+create role analyst;
+GRANT SELECT,INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA company to analyst;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA company TO system;
+
+--SISTEMA
+create role system;
+GRANT SELECT,INSERT, UPDATE, DELETE  ON ALL TABLES IN SCHEMA company TO system;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA company TO system;
+
+--ESTAGIÁRIO
+create user suport;
+GRANT select ON ALL TABLES IN SCHEMA company TO suport;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA company TO system;
+
+--Tabela Tipos de Usuários
 CREATE TABLE IF NOT EXISTS company.type_user(
     id          bigserial    constraint pk_id_type_user          primary key,
     name        varchar(50)  constraint nn_type_user_name        not null,
@@ -24,8 +40,7 @@ INSERT INTO company.type_user (id,name,description) VALUES
 (5,'ADMINISTRATIVO',  'Administrativo da Empresa (RH, Financeiro, etc.)'),
 (6,'CLIENTE',         'Cliente');
 
-
---Tabela de UsuÃ¡rios
+--Tabela de Usuários
 CREATE TABLE IF NOT EXISTS company.user(
     id           bigserial    constraint pk_id_user          primary key,
     id_type_user integer      constraint nn_user_type        not null,
@@ -42,21 +57,21 @@ CREATE TABLE IF NOT EXISTS company.user(
 );
 
 INSERT INTO company.user (name,id_type_user,doc_type,doc_number,adress,city,state) VALUES
-('Gabriel',  1, 'RG',   '1236549',     'Rua Quinze, n10',          'UberlÃ¢ndia',   'MG'),
+('Gabriel',  1, 'RG',   '1236549',     'Rua Quinze, n10',          'Uberlândia',   'MG'),
 ('Henrique', 2, 'CPF',  '0435489003',  'Av. Segismundo n9876',     'Santos',       'SP'),
-('MÃ¡rcio',   3, 'CNH',  '654987',      'Rua Palmares, n789',       'Rio Branco',   'AC'),
-('Lucas',    4, 'RG',   '987878',      'Rua dos Pires, n888',      'SÃ£o Paulo',    'SP'),
+('Márcio',   3, 'CNH',  '654987',      'Rua Palmares, n789',       'Rio Branco',   'AC'),
+('Lucas',    4, 'RG',   '987878',      'Rua dos Pires, n888',      'São Paulo',    'SP'),
 ('Rodrigo',  5, 'RG',   '4564564',     'Av. 11 de Maio, n10',      'Araguari',     'MG'),
-('Gustavo',  6, 'CPF',  '6959150604',  'Rua Pedro Pereira, n558',  'SÃ£o Gotardo',  'MG'),
-('JoÃ£o',     3, 'CPF',  '5985223507',  'Av. Rondon, n1654',        'AraxÃ¡',        'MG'),
+('Gustavo',  1, 'CPF',  '6959150604',  'Rua Pedro Pereira, n558',  'São Gotardo',  'MG'),
+('João',     3, 'CPF',  '5985223507',  'Av. Rondon, n1654',        'Araxá',        'MG'),
 ('Jorge',    3, 'RG',   '8547889997',  'Av. Peixes, n1654',        'Paracatu',     'MG'),
-('Pedro',    3, 'CPF',  '1020304050',  'Av. CÃ©sar, n1654',         'IndianÃ³polis', 'MG'),
-('CÃ©sar',    6, 'CNH',  '4002892200',  'BR 040, n1654',            'GuarujÃ¡',      'SP'),
-('Herik',    6, 'CNH',  '9991143468',  'Av. JoÃ£o, n1654',          'Salvador',     'BA'),
+('Pedro',    3, 'CPF',  '1020304050',  'Av. César, n1654',         'Indianópolis', 'MG'),
+('César',    6, 'CNH',  '4002892200',  'BR 040, n1654',            'Guarujá',      'SP'),
+('Herik',    6, 'CNH',  '9991143468',  'Av. João, n1654',          'Salvador',     'BA'),
 ('Lucimar',  6, 'CPF',  '1598169987',  'Rua. Pedro, n1654',        'Uberaba',      'MG'),
 ('Gabriela', 6, 'RG',   '1298655478',  'Av. Gabriel, n1654',       'Ouro Preto',   'MG'),
-('GlÃ¡ucia',  6, 'RG',   '6658999999',  'Av. Sem Nome, n1654',      'Curitiba',     'PR'),
-('Sabrina',  6, 'CPF',  '5564456350',  'PraÃ§a dos Manos, n1654',   'BrasÃ­lia',     'DF');
+('Gláucia',  6, 'RG',   '6658999999',  'Av. Sem Nome, n1654',      'Curitiba',     'PR'),
+('Sabrina',  6, 'CPF',  '5564456350',  'Praça dos Manos, n1654',   'Brasília',     'DF');
 
 --Tabela de Produto
 CREATE TABLE IF NOT EXISTS company.product(
@@ -78,7 +93,7 @@ INSERT INTO company.product (code,name,value) VALUES
 ('321654', 'Cadeira Gamer',   3524.00),
 ('123654', 'Ventilador Arno', 1999.99);
 
---Criando Tabela de VeÃ­culos
+--Criando Tabela de Veículos
 CREATE TABLE IF NOT EXISTS company.vehicle(
     id          bigserial   constraint  pk_id_vehicle         primary key,
     code        varchar(20) constraint  nn_vehicle_code       not null,
@@ -90,10 +105,10 @@ CREATE TABLE IF NOT EXISTS company.vehicle(
 
 INSERT INTO company.vehicle (code,name) VALUES
 ('HHW3305', 'VW Saveiro'),
-('UJW2602', 'FIAT DoblÃ´'),
+('UJW2602', 'FIAT Doblô'),
 ('BRA0S17', 'FIAT Fiorino'),
 ('ABC1B34', 'FIAT Fiorino'),
-('ACD8B99', 'CaminhÃ£o Scania');
+('ACD8B99', 'Caminhão Scania');
 
 --Criando Tabela de Status de Entrega
 CREATE TABLE IF NOT EXISTS company.delivery_status(
@@ -104,12 +119,13 @@ CREATE TABLE IF NOT EXISTS company.delivery_status(
 );
 
 INSERT INTO company.delivery_status (name,description) VALUES
-('A CAMINHO',               'Pedido a Caminho do Centro de DistribuiÃ§Ã£o'),
-('EM ROTA DE ENTREGA',      'Pedido Saiu para Entrega ao DestinatÃ¡rio'),
+('A CAMINHO',               'Pedido a Caminho do Centro de Distribuição'),
+('EM ROTA DE ENTREGA',      'Pedido Saiu para Entrega ao Destinatário'),
 ('ENTREGUE',                'Pedido Entregue'),
 ('CANCELADO',               'Pedido foi Cancelado');
 
 --Tabela de log de Pedidos
+
 CREATE TABLE IF NOT EXISTS company.delivery(
     id                  bigserial       constraint pk_id_delivery               primary key,
     id_vehicle          integer,
@@ -119,12 +135,14 @@ CREATE TABLE IF NOT EXISTS company.delivery(
     amount_product      integer         constraint nn_delivery_amount_product   NOT NULL,
     value_delivery      numeric(12,2)   constraint nn_delivery_value_delivery   NOT NULL,
     id_delivery_status  integer,
-    ts_created          timestamp       constraint nn_product_ts_created        NOT NULL DEFAULT now(),
-    CONSTRAINT          fk_delivery_id_vehicle          FOREIGN KEY(id_vehicle)         REFERENCES company.vehicle(id)          ON DELETE CASCADE,
-    CONSTRAINT          fk_delivery_id_user_employee    FOREIGN KEY(id_user_employee)   REFERENCES company.user(id)             ON DELETE CASCADE,
-    CONSTRAINT          fk_delivery_id_user_client      FOREIGN KEY(id_user_client)     REFERENCES company.user(id)             ON DELETE CASCADE,
-    CONSTRAINT          fk_delivery_id_product          FOREIGN KEY(id_product)         REFERENCES company.product(id)          ON DELETE CASCADE,
-    CONSTRAINT          fk_delivery_id_delivery_status  FOREIGN KEY(id_delivery_status) REFERENCES company.delivery_status(id)  ON DELETE CASCADE
+    ts_created          timestamp       constraint nn_delivery_ts_created        NOT NULL DEFAULT now(),
+    CONSTRAINT          chk_delivery_amount_product     CHECK       ((amount_product >= (0)::numeric)),
+    CONSTRAINT          chk_delivery_value              CHECK       ((value_delivery >= (0)::numeric)),
+    CONSTRAINT          fk_delivery_id_vehicle          FOREIGN KEY (id_vehicle)         REFERENCES company.vehicle(id)          ON DELETE CASCADE,
+    CONSTRAINT          fk_delivery_id_user_employee    FOREIGN KEY (id_user_employee)   REFERENCES company.user(id)             ON DELETE CASCADE,
+    CONSTRAINT          fk_delivery_id_user_client      FOREIGN KEY (id_user_client)     REFERENCES company.user(id)             ON DELETE CASCADE,
+    CONSTRAINT          fk_delivery_id_product          FOREIGN KEY (id_product)         REFERENCES company.product(id)          ON DELETE CASCADE,
+    CONSTRAINT          fk_delivery_id_delivery_status  FOREIGN KEY (id_delivery_status) REFERENCES company.delivery_status(id)  ON DELETE CASCADE
 );
 
 --Function para ajudar no Insert
@@ -174,4 +192,88 @@ INSERT INTO company.delivery(id_vehicle, id_user_employee, id_user_client, id_pr
 (company.fn_random_vehicle(), company.fn_random_user_id_by_type('ENTREGADOR'), company.fn_random_user_id_by_type('CLIENTE'), company.fn_random_product(), floor(random()*30)+1, (random()*1000)+1, company.fn_random_delivery_status()),
 (company.fn_random_vehicle(), company.fn_random_user_id_by_type('ENTREGADOR'), company.fn_random_user_id_by_type('CLIENTE'), company.fn_random_product(), floor(random()*30)+1, (random()*1000)+1, company.fn_random_delivery_status()),
 (company.fn_random_vehicle(), company.fn_random_user_id_by_type('ENTREGADOR'), company.fn_random_user_id_by_type('CLIENTE'), company.fn_random_product(), floor(random()*30)+1, (random()*1000)+1, company.fn_random_delivery_status()),
+(company.fn_random_vehicle(), company.fn_random_user_id_by_type('ENTREGADOR'), company.fn_random_user_id_by_type('CLIENTE'), company.fn_random_product(), floor(random()*30)+1, (random()*1000)+1, company.fn_random_delivery_status()),
 (company.fn_random_vehicle(), company.fn_random_user_id_by_type('ENTREGADOR'), company.fn_random_user_id_by_type('CLIENTE'), company.fn_random_product(), floor(random()*30)+1, (random()*1000)+1, company.fn_random_delivery_status());
+
+--CREATE VIEWS
+--Relatório de Pedidos
+create or replace view company.vw_report_delivery as
+select
+	d.id as id_delivery,
+    v.code as code_vehicle,
+	v.name as vehicle,
+	u1.name as deliveryman,
+	u2.name as client,
+	p.name as product,
+	(p.value * d.amount_product) + d.value_delivery as vl_t_product,
+	ds.name as status_delivery,
+	to_char(d.ts_created,'DD/MM/YYYY') as data_delivery,
+	to_char(d.ts_created,'HH:MI:SS') as horary_delivery
+from
+	company.delivery d
+	join company.vehicle v on v.id = d.id_vehicle
+	join company.user u1 on u1.id = d.id_user_employee
+	join company.user u2 on u2.id = d.id_user_client
+	join company.product p on p.id = d.id_product
+	join company.delivery_status ds on ds.id = d.id_delivery_status;
+
+--Quantidade de Pedidos por Estado
+create or replace view company.vw_amount_delivery_by_state as
+select
+	u.state state,
+	count(*) amount_delivery
+from
+	company.delivery d
+	join company.user u on u.id = d.id_user_client
+group by u.state;
+
+--Quantidade de Pedidos por Status
+create or replace view company.vw_amount_delivery_by_status as
+select
+	ds.name status,
+	ds.description description,
+	count(*) amount_delivery
+from
+	company.delivery d
+	join company.delivery_status ds on ds.id = d.id_delivery_status
+group by ds.name, ds.description;
+
+--Trigger
+CREATE TABLE IF NOT EXISTS company.delivery_log(
+    operation   		VARCHAR(20)     NOT NULL,
+    user_name   		VARCHAR(100)    NOT NULL,
+    ts_register 		TIMESTAMP   	NOT null,
+    like company.delivery
+);
+
+--Criando Procedure
+CREATE OR REPLACE FUNCTION company.fn_delivery_log()
+RETURNS trigger AS
+$$
+    BEGIN
+        IF(tg_op = 'DELETE') then
+      		INSERT INTO company.delivery_log 
+              	-- SELECT 'DELETE', user, now(), OLD.id, OLD.id_vehicle, OLD.id_user_employee, OLD.id_user_client, OLD.id_product, OLD.amount_product, OLD.value_delivery, OLD.id_delivery_status, OLD.ts_created;
+              	SELECT 'DELETE', user, now(), OLD.*;
+            RETURN OLD;
+        ELSIF(tg_op = 'TRUNCATE') then
+      		INSERT INTO company.delivery_log 
+              	SELECT 'TRUNCATE', user, now(), OLD.*;
+            RETURN OLD;
+        ELSIF(tg_op = 'UPDATE') THEN
+            INSERT INTO company.delivery_log 
+           		SELECT 'UPDATE', user, now(), NEW.*;
+            RETURN NEW;
+        ELSIF(tg_op = 'INSERT') then
+            INSERT INTO company.delivery_log
+            	SELECT 'INSERT', user, now(), NEW.*;
+            RETURN NEW;
+        END IF;
+        RETURN NULL;
+    END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER tg_delivery_log
+AFTER INSERT OR UPDATE OR DELETE ON company.delivery
+FOR EACH ROW EXECUTE PROCEDURE company.fn_delivery_log();
